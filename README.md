@@ -12,7 +12,7 @@ With this role you'lle be able to :
 
 ## Usage
 
-First of all, install files into `/etc/ansible/roles/ansible-jenkins`, your arborescenc should look like this :
+First of all, install files into `/etc/ansible/roles/ansible-jenkins`, your directory tree should look like this :
 
     /etc/ansible/roles/ansible-jenkins
     |
@@ -58,4 +58,80 @@ jobs:
     name: job2
     config_path: /vagrant/job2.xml
 ```
+
+In order to run it, you just have to include this role in your playbook, for instance : 
+``` yml
+---
+- hosts: jenkins
+  sudo: yes
+
+  pre_tasks:
+  - name: ensure java8 installed
+    yum: name=java-1.8.0-openjdk-devel state=present
+  - name: ensure firewall is off
+    service: name=firewalld state=stopped enabled=false
+
+  roles:
+    - ansible-jenkins
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
