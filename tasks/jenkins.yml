@@ -12,13 +12,13 @@
 - name: "configure jenkins"
   template: src=jenkins.j2 dest=/etc/sysconfig/jenkins owner=root group=root mode=0600
   notify: 
-  - restart jenkins
+  - "restart jenkins"
   
 - name: "run jenkins as another user"
   shell: chown -R {{ jenkins_user }}:{{ jenkins_group }} {{ jenkins_home }} /var/cache/jenkins /var/log/jenkins
   when: jenkins_user != 'jenkins' or jenkins_group != 'jenkins'
   notify: 
-  - restart jenkins
+  - "restart jenkins"
   
 - service: name=jenkins state=started
   

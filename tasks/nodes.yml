@@ -1,6 +1,6 @@
 ---
 
-- shell: java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ get-node {{ item.value.name }} 2>&1 | grep -c '<?xml version="1.0" encoding="UTF-8"?>'
+- shell: java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ get-node {{ item.value.name }} 2>&1 | grep -c "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
   sudo: yes
   register: jenkins_nodes_exist
   with_dict: "{{ nodes }}"
