@@ -1,0 +1,13 @@
+---
+
+- name: "install plugins"
+  get_url: url={{ jenkins_plugins_url }}/{{ item.value.name }}/{{ item.value.version }}/{{ item.value.name }}.hpi dest={{ jenkins_home }}/plugins/{{ item.value.name }}.hpi 
+  with_dict: "{{ plugins }}"
+  when: plugins is defined
+  
+- name: "set downloaded plugins {{ jenkins_user }} permissions"
+  file: path={{ jenkins_home }}/plugins/{{ item.value.name }}.hpi owner={{ jenkins_user }} group={{ jenkins_group }} mode=0644
+  with_dict: "{{ plugins }}"
+  when: plugins is defined
+  notify: 
+  - restart jenkins

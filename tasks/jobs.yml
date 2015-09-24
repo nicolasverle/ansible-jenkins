@@ -1,0 +1,16 @@
+---
+
+- shell: java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ get-job {{ item.value.name }} 2>&1 | grep -c "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" | sed -e 's/0/create\-job/g; s/1/update\-job/g'
+  sudo: yes
+  register: jenkins_jobs_cmd
+  with_dict: "{{ jobs }}"
+  changed_when: False
+  failed_when: False
+  
+- copy: src={{ item.value.config_path }} dest=/tmp/{{ item.key }}.xml
+  with_dict: "{{ jobs }}"
+  
+- name: "create or update jobs"
+  sudo: yes
+  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ {{ item.stdout }} {{ item.item.value.name }}
+  with_items: "{{ jenkins_jobs_cmd.results }}"

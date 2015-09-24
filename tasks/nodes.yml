@@ -1,0 +1,18 @@
+---
+
+- shell: java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ get-node {{ item.value.name }} 2>&1 | grep -c '<?xml version="1.0" encoding="UTF-8"?>'
+  sudo: yes
+  register: jenkins_nodes_exist
+  with_dict: "{{ nodes }}"
+  changed_when: False
+  failed_when: False 
+  
+- copy: src={{ item.item.value.config_path }} dest=/tmp/{{ item.item.key }}.xml
+  with_items: "{{ jenkins_nodes_exist.results }}"
+  when: item.stdout == '0'
+  
+- name: "call nodes creation"
+  sudo: yes
+  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ create-node {{ item.item.value.name }}
+  with_items: "{{ jenkins_nodes_exist.results }}"
+  when: item.stdout == '0'
