@@ -1,13 +1,15 @@
 ---
 
-- name: "get official repo"
-  get_url: url=http://pkg.jenkins-ci.org/redhat/jenkins.repo dest=/etc/yum.repos.d/jenkins.repo mode=0644
+- get_url: url=http://pkg.jenkins-ci.org/redhat/jenkins.repo dest=/etc/yum.repos.d/jenkins.repo mode=0644
   
-- name: "get redhat repo key"
-  rpm_key: state=present key=http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
-  
-- name: "install jenkins latest rpm"
-  yum: name=jenkins state=present
+- rpm_key: state=present key=http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
+
+- yum_version: name=jenkins version="{{ jenkins_version }}"
+  register: package
+  when: jenkins_version is defined
+ 
+- name: "install rpm : {{ package.label }}"
+  yum: name="{{ package.label }}" state=present
   
 - name: "configure jenkins"
   template: src=jenkins.j2 dest=/etc/sysconfig/jenkins owner=root group=root mode=0600
