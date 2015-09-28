@@ -38,6 +38,7 @@ Next, let assume you have jenkins group section configured in `/etc/ansible/host
 ``` yml
 ---
 jenkins_port: 9090
+jenkins_version: 1.620-1.1
 plugins:
   git:
     name: git

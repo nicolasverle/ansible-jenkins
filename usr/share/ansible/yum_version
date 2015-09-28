@@ -1,0 +1,42 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#
+# yum_version - Format correct package name with version number for yum
+#
+
+DOCUMENTATION = '''
+---
+module: yum_version
+'''
+
+import sys
+import json
+import shlex
+
+# read the argument string from the arguments file
+args_file = sys.argv[1]
+args_data = file(args_file).read()
+
+package = ""
+version = ""
+
+arguments = shlex.split(args_data)
+for arg in arguments:
+	if '=' in arg:
+		(key, value) = arg.split("=")
+		if key == "version":
+			version = value
+		if key == "name":
+			package = value
+
+label = package
+
+print "label value %s".format(label)
+
+if version != "latest" and version != "":
+	label += "-" + version
+
+print json.dumps({
+	"label" : label
+})
+
