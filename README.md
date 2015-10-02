@@ -33,6 +33,10 @@ First of all, install files into `/etc/ansible/roles/ansible-jenkins`, your dire
     |_ vars
        |_ main.yml
 
+You also have to install a little custom module called _yum_version_ inside the _library_ folder you defined in `/etc/ansible/ansible.cfg` : 
+```properties
+library        = /usr/share/ansible/
+```
 
 Next, let assume you have jenkins group section configured in `/etc/ansible/hosts`, you can now configure groups variables in `/etc/ansible/group_vars/jenkins` this way : 
 ``` yml
@@ -75,64 +79,3 @@ In order to run it, you just have to include this role in your playbook, for ins
   roles:
     - ansible-jenkins
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
