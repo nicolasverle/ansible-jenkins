@@ -15,7 +15,7 @@
   
 - name: "create or update jobs"
   sudo: yes
-  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ {{ item.stdout }} {{ item.item.value.name }}
+  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}{{ jenkins_ctx.stdout }}/ {{ item.stdout }} {{ item.item.value.name }}
   with_items: "{{ jenkins_jobs_cmd.results }}"
   when: jobs is defined and item.stdout != ""
   
