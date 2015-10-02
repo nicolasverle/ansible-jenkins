@@ -4,7 +4,7 @@
   with_dict: "{{ jobs }}"
   when: jobs is defined
   
-- shell: diff -q <(xmllint --format /tmp/{{ item.key }}.xml) <(xmllint --format {{ jenkins_home }}/jobs/{{ item.key }}/config.xml) 2>&1 | sed -e 's/^diff:.*No such file or directory$/create\-job/g; s/^Files .*differ/update\-job/g;'
+- shell: test -f {{ jenkins_home }}/jobs/{{ item.key }}/config.xml && diff -q <(xmllint --format /tmp/{{ item.key }}.xml) <(xmllint --format {{ jenkins_home }}/jobs/{{ item.key }}/config.xml) 2>&1 | sed -e 's/^Files .*differ/update\-job/g;' || echo "create-job"
   args: 
     executable: /bin/bash
   register: jenkins_jobs_cmd
@@ -15,7 +15,7 @@
   
 - name: "create or update jobs"
   sudo: yes
-  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}{{ jenkins_ctx.stdout }}/ {{ item.stdout }} {{ item.item.value.name }}
+  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}{{ jenkins_ctx.stdout|default('') }}/ {{ item.stdout }} {{ item.item.value.name }}
   with_items: "{{ jenkins_jobs_cmd.results }}"
   when: jobs is defined and item.stdout != ""
   
