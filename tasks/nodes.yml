@@ -1,18 +1,19 @@
 ---
 
-- shell: java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ get-node {{ item.value.name }} 2>&1 | grep -c "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-  sudo: yes
-  register: jenkins_nodes_exist
+- copy: src={{ item.value.config_path }} dest=/tmp/{{ item.key }}.xml
   with_dict: "{{ nodes }}"
+  when: nodes is defined
+  
+- shell: diff -q <(xmllint --format /tmp/{{ item.key }}.xml) <(xmllint --format {{ jenkins_home }}/nodes/{{ item.key }}/config.xml) 2>&1 | sed -e 's/^diff:.*No such file or directory$/create\-node/g; s/^Files .*differ/update\-node/g;'
+  args: 
+    executable: /bin/bash
+  register: jenkins_nodes_cmd
+  with_dict: "{{ nodes }}"
+  failed_when: False
   changed_when: False
-  failed_when: False 
   
-- copy: src={{ item.item.value.config_path }} dest=/tmp/{{ item.item.key }}.xml
-  with_items: "{{ jenkins_nodes_exist.results }}"
-  when: item.stdout == '0'
-  
-- name: "call nodes creation"
+- name: "create or update nodes"
   sudo: yes
-  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ create-node {{ item.item.value.name }}
-  with_items: "{{ jenkins_nodes_exist.results }}"
-  when: item.stdout == '0'
+  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}/ {{ item.stdout }} {{ item.item.value.name }}
+  with_items: "{{ jenkins_nodes_cmd.results }}"
+  when: item.stdout != ""

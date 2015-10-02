@@ -7,6 +7,9 @@
 - yum_version: name=jenkins version="{{ jenkins_version }}"
   register: package
   when: jenkins_version is defined
+  
+- yum: name=libxml2 state=present
+  when: jobs is defined or nodes is defined
  
 - name: "install rpm : {{ package.label }}"
   yum: name="{{ package.label }}" state=present
