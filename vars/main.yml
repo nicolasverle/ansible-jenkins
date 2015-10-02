@@ -24,4 +24,3 @@ jenkins_cli_dest: "{{ jenkins_dest }}/jenkins-cli.jar"
 jenkins_home: "/var/lib/jenkins"
 jenkins_user: "jenkins"
 jenkins_group: "jenkins"
-jenkins_port: 8080

@@ -25,7 +25,7 @@
   - "restart jenkins"
   
 - name: "run jenkins as another user"
-  shell: chown -R {{ jenkins_user }}:{{ jenkins_group }} {{ jenkins_home }} /var/cache/jenkins /var/log/jenkins
+  shell: chown -R {{ jenkins_user|default('jenkins') }}:{{ jenkins_group|default('jenkins') }} {{ jenkins_home }} /var/cache/jenkins /var/log/jenkins
   when: jenkins_user != 'jenkins' or jenkins_group != 'jenkins'
   notify: 
   - "restart jenkins"
@@ -36,7 +36,7 @@
   file: path={{ jenkins_dest }} state=directory
 
 - name: "Get Jenkins CLI"
-  get_url: url=http://localhost:{{ jenkins_port }}{{ jenkins_ctx.stdout|default('') }}/jnlpJars/jenkins-cli.jar dest={{ jenkins_cli_dest }} mode=0440
+  get_url: url=http://localhost:{{ jenkins_port|default(8080) }}{{ jenkins_ctx.stdout|default('') }}/jnlpJars/jenkins-cli.jar dest={{ jenkins_cli_dest }} mode=0440
   register: jenkins_local_cli
   until: "'OK' in jenkins_local_cli.msg or 'file already exists' in jenkins_local_cli.msg"
   retries: 5

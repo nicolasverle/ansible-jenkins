@@ -4,7 +4,7 @@
   with_dict: "{{ nodes }}"
   when: nodes is defined
   
-- shell: test -f {{ jenkins_home }}/nodes/{{ item.value.name }}/config.xml && diff -q  <(xmllint --format /tmp/{{ item.key }}.xml) <(xmllint --format {{ jenkins_home }}/nodes/{{ item.value.name }}/config.xml) 2>&1 | sed -e 's/^Files .*differ/update\-node/g;' || echo "create-node"
+- shell: test -f {{ jenkins_home }}/nodes/{{ item.value.name }}/config.xml && diff -q  <(xmllint --format /tmp/{{ item.key }}.xml) <(xmllint --format {{ jenkins_home|default('/var/lib/jenkins') }}/nodes/{{ item.value.name }}/config.xml) 2>&1 | sed -e 's/^Files .*differ/update\-node/g;' || echo "create-node"
   args: 
     executable: /bin/bash
   register: jenkins_nodes_cmd
@@ -14,6 +14,6 @@
   
 - name: "create or update nodes"
   sudo: yes
-  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port }}{{ jenkins_ctx.stdout|default('') }}/ {{ item.stdout }} {{ item.item.value.name }}
+  shell: cat /tmp/{{ item.item.key }}.xml | java -jar {{ jenkins_cli_dest }} -s http://localhost:{{ jenkins_port|default(8080) }}{{ jenkins_ctx.stdout|default('') }}/ {{ item.stdout }} {{ item.item.value.name }}
   with_items: "{{ jenkins_nodes_cmd.results }}"
   when: item.stdout != ""
